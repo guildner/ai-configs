@@ -2,7 +2,10 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-REMOTE_HOSTS="${OMP_REMOTE_HOSTS:-dever thump}"
+# No remote hosts configured in this fork yet (upstream used "dever thump",
+# the original author's machines). Set OMP_REMOTE_HOSTS or pass --hosts when
+# you have remote machines; empty means local-only.
+REMOTE_HOSTS="${OMP_REMOTE_HOSTS:-}"
 REMOTE_BRANCH="${OMP_REMOTE_BRANCH:-$(git -C "$REPO_ROOT" branch --show-current)}"
 REMOTE_REPO_PATH="${OMP_REMOTE_REPO_PATH:-}"
 STRICT="${OMP_CONFIG_STRICT_REMOTE:-1}"

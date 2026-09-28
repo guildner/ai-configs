@@ -31,8 +31,12 @@ grep -q 'kitty-paste-image-to-ssh' "$MAC_HOME/.config/kitty/ai-configs-remote-wo
 [[ "$(grep -c '^# BEGIN ai-configs kitty remote workflow$' "$MAC_HOME/.zshrc")" -eq 1 ]]
 [[ "$(grep -c '^# BEGIN ai-configs kitty remote workflow$' "$MAC_HOME/.config/kitty/kitty.conf")" -eq 1 ]]
 [[ "$(grep -c '^# BEGIN ai-configs kitty remote workflow$' "$MAC_HOME/.config/kitty/ssh.conf")" -eq 1 ]]
-grep -q '^mbp=anichols@mbp$' "$MAC_HOME/.clipssh/aliases"
-grep -q '^dever=anichols@dever$' "$MAC_HOME/.clipssh/aliases"
+# This fork seeds no clipssh aliases: no remote hosts are configured. The
+# installer should leave the aliases file empty of user@host entries.
+if grep -q '@' "$MAC_HOME/.clipssh/aliases" 2>/dev/null; then
+  echo 'expected no seeded clipssh aliases (no remote hosts configured)' >&2
+  exit 1
+fi
 
 cat > "$LINUX_HOME/.config/herdr/config.toml" <<'EOF'
   [ui.toast]
@@ -65,8 +69,8 @@ cat > "$FAKE_BIN/pbcopy" <<'EOF'
 cat > "$TEST_CAPTURE_DIR/clipboard"
 EOF
 chmod +x "$FAKE_BIN/ssh" "$FAKE_BIN/pbcopy"
-first_path="$(HOME="$MAC_HOME" PATH="$FAKE_BIN:/usr/bin:/bin" OSTYPE=darwin TEST_CAPTURE_DIR="$CAPTURE_DIR" CLIPSSH_REMOTE_DIR='~/.cache/clipssh' "$REPO_ROOT/scripts/clipssh" mbp >/dev/null; cat "$CAPTURE_DIR/clipboard")"
-second_path="$(HOME="$MAC_HOME" PATH="$FAKE_BIN:/usr/bin:/bin" OSTYPE=darwin TEST_CAPTURE_DIR="$CAPTURE_DIR" CLIPSSH_REMOTE_DIR='~/.cache/clipssh' "$REPO_ROOT/scripts/clipssh" mbp >/dev/null; cat "$CAPTURE_DIR/clipboard")"
+first_path="$(HOME="$MAC_HOME" PATH="$FAKE_BIN:/usr/bin:/bin" OSTYPE=darwin TEST_CAPTURE_DIR="$CAPTURE_DIR" CLIPSSH_REMOTE_DIR='~/.cache/clipssh' "$REPO_ROOT/scripts/clipssh" test@mbp >/dev/null; cat "$CAPTURE_DIR/clipboard")"
+second_path="$(HOME="$MAC_HOME" PATH="$FAKE_BIN:/usr/bin:/bin" OSTYPE=darwin TEST_CAPTURE_DIR="$CAPTURE_DIR" CLIPSSH_REMOTE_DIR='~/.cache/clipssh' "$REPO_ROOT/scripts/clipssh" test@mbp >/dev/null; cat "$CAPTURE_DIR/clipboard")"
 [[ "$first_path" == '~/.cache/clipssh/clipboard-'*.png ]]
 [[ "$second_path" == '~/.cache/clipssh/clipboard-'*.png ]]
 [[ "$first_path" != "$second_path" ]]

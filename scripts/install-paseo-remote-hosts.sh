@@ -5,7 +5,10 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-REMOTE_HOSTS="${PASEO_REMOTE_HOSTS:-mbp dever thump}"
+# No remote hosts configured in this fork yet (upstream used "mbp dever thump",
+# the original author's machines). Set PASEO_REMOTE_HOSTS or pass --hosts when
+# you have remote machines of your own; empty means local-only.
+REMOTE_HOSTS="${PASEO_REMOTE_HOSTS:-}"
 STRICT="${PASEO_CONFIG_STRICT_REMOTE:-0}"
 
 while (($#)); do

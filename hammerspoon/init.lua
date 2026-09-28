@@ -1,6 +1,10 @@
--- Cmd+Shift+V uploads the current local clipboard image to both coding hosts
--- only when a supported terminal application is focused. In every other app,
--- the original key event is passed through unchanged.
+-- Cmd+Shift+V uploads the current local clipboard image to the configured
+-- remote coding hosts only when a supported terminal application is focused.
+-- In every other app, the original key event is passed through unchanged.
+--
+-- NOTE: no remote hosts are configured in this fork yet. remote-image-paste's
+-- TARGETS list is empty, so this hotkey currently just reports an error.
+-- Set TARGETS in scripts/remote-image-paste when you add remote machines.
 --
 -- Kitty and WezTerm are intentionally excluded: each already owns
 -- Cmd+Shift+V with a host-aware paste helper. Intercepting those apps caused
@@ -27,7 +31,7 @@ local function startImagePaste()
   end
 
   imagePasteRunning = true
-  hs.alert.show("Uploading image to dever and mbp…", 1)
+  hs.alert.show("Uploading image to remote hosts…", 1)
 
   local task = hs.task.new(remoteImagePaste, function(exitCode, stdout, stderr)
     imagePasteRunning = false

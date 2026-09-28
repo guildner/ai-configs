@@ -29,9 +29,12 @@ while (($#)); do
   esac
 done
 
+# No remote hosts configured in this fork yet. Upstream restricted --host to
+# the author's machines (mbp|dever|thump|mbp14-2); keep this allowlist empty
+# until you add your own hosts, then list them here.
 case "$host" in
-  mbp|dever|thump|mbp14-2) ;;
-  *) fail 'host must be mbp, dever, thump, or mbp14-2' ;;
+  # myhost1|myhost2) ;;
+  *) fail 'host is not in the configured remote-host allowlist (edit this script)' ;;
 esac
 [[ "$pane_id" =~ ^[0-9]+$ ]] || fail 'pane ID must be numeric'
 

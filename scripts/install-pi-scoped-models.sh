@@ -15,7 +15,10 @@ set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 CAPTURE="${PI_SCOPED_MODELS_CAPTURE:-$REPO_ROOT/_pi/scoped-models.json}"
-REMOTE_HOSTS="${PI_SCOPED_MODELS_REMOTE_HOSTS:-mbp dever thump}"
+# No remote hosts configured in this fork yet (upstream used "mbp dever thump",
+# the original author's machines). Set PI_SCOPED_MODELS_REMOTE_HOSTS or pass
+# --hosts when you have remote machines; empty means local-only.
+REMOTE_HOSTS="${PI_SCOPED_MODELS_REMOTE_HOSTS:-}"
 STRICT="${PI_SCOPED_MODELS_STRICT_REMOTE:-0}"
 SSH_OPTS=(-o BatchMode=yes -o ConnectTimeout=8)
 

@@ -171,7 +171,9 @@ checkouts and non-fast-forward pulls:
 bash scripts/install-omp-remote-hosts.sh
 ```
 
-The helper defaults to `dever` and `thump`; override with `OMP_REMOTE_HOSTS`.
+The helper defaults to no remote hosts in this fork (upstream used `dever`
+and `thump`); set `OMP_REMOTE_HOSTS` or pass `--hosts` to enable remote
+deployment once you have remote machines.
 Use `OMP_REMOTE_BRANCH` and `OMP_REMOTE_REPO_PATH` when the checkout differs
 from the local branch or the default `$HOME/code/ai-configs` path. It never
 copies source trees with tar, rsync, or scp, and never transfers `auth.json`,
@@ -181,7 +183,10 @@ destination are moved to a timestamped
 `~/.omp/agent.before-ai-configs/` backup before reconciliation.
 
 ### `amp/`
-Canonical Amp CLI settings and custom plugin modes from `plugins/subscription-models.ts`: `ADN Low` (Luna max), `ADN High` (Terra high), `adn_oracle` tool/mode (Sol high), and `adn_alt` tool/mode (Grok 4.5 high). Amp's built-in `low`/`medium`/`high`/`ultra` keys cannot be overwritten; these ADN modes sit beside them. `install.sh --tools` and `install.sh --all` install them to `~/.config/amp/`, preserve first-differing backups as `*.before-ai-configs`, and on macOS stream the bundle to `mbp`, `dever`, and `thump` (override with `AMP_REMOTE_HOSTS`). Model-provider subscriptions stay host-local credentials.
+Canonical Amp CLI settings and custom plugin modes from `plugins/subscription-models.ts`: `ADN Low` (Luna max), `ADN High` (Terra high), `adn_oracle` tool/mode (Sol high), and `adn_alt` tool/mode (Grok 4.5 high). Amp's built-in `low`/`medium`/`high`/`ultra` keys cannot be overwritten; these ADN modes sit beside them. `install.sh --tools` and `install.sh --all` install them to `~/.config/amp/`, preserve first-differing backups as `*.before-ai-configs`. Remote deployment
+is disabled in this fork — no remote hosts are configured (upstream streamed
+the bundle to `mbp`, `dever`, and `thump`; set `AMP_REMOTE_HOSTS` to
+re-enable). Model-provider subscriptions stay host-local credentials.
 
 Run `bash amp/install.sh` for an Amp-only local install.
 
@@ -189,28 +194,35 @@ Run `bash amp/install.sh` for an Amp-only local install.
 Repo-managed Paseo skills. `install.sh --tools` and `install.sh --all` install `_paseo/skills/` into `~/.agents/skills`, `~/.claude/skills`, and `~/.codex/skills`. The only daemon key they write is `agents.skills.selection` (`custom`, empty list) so the daemon does not revert those directories at startup. Agent profiles, providers, relay, listen, CORS, and feature flags stay on the host. The first differing skill directory is preserved as `<name>.before-ai-configs`. Tune the skills by editing `_paseo/skills/`; the daemon's skills UI will show drift if it offers to reinstall the bundle — decline, or rerun the installer.
 
 
-Run `bash _paseo/install.sh` for a Paseo-only local install. The normal tools workflow also streams the bundle to `mbp`, `dever`, and `thump` over SSH (the local host is skipped; override with `PASEO_REMOTE_HOSTS`, skip with `PASEO_CONFIG_SKIP_REMOTE=1`, fail hard with `PASEO_CONFIG_STRICT_REMOTE=1`).
+Run `bash _paseo/install.sh` for a Paseo-only local install. Remote
+deployment is disabled in this fork — no remote hosts are configured
+(upstream streamed the bundle to `mbp`, `dever`, and `thump` over SSH;
+re-enable by uncommenting the call in `install_paseo_config` and setting
+`PASEO_REMOTE_HOSTS`, or `PASEO_CONFIG_STRICT_REMOTE=1` to fail hard).
 
 ### `herdr/`
-Canonical host-independent Herdr configuration plus its installer. `install.sh --tools` and `install.sh --all` install it to `~/.config/herdr/config.toml`, preserving the first differing local file as `config.toml.before-ai-configs`. The same configuration validates on the current Herdr versions on `mbp`, `dever`, `thump`, and `mba`; it intentionally standardizes theme and UI preferences across hosts.
+Canonical host-independent Herdr configuration plus its installer. `install.sh --tools` and `install.sh --all` install it to `~/.config/herdr/config.toml`, preserving the first differing local file as `config.toml.before-ai-configs`. Upstream validated the same configuration across the original author's hosts (`mbp`, `dever`, `thump`, `mba`); it intentionally standardizes theme and UI preferences across hosts.
 
-Run `bash herdr/install.sh` for a Herdr-only local install. From macOS, the normal tools workflow also streams it to the configured Kitty remote hosts. Override those targets when needed, for example:
+Run `bash herdr/install.sh` for a Herdr-only local install. Remote deployment
+is disabled in this fork — no remote hosts are configured. Once you have
+remote machines, re-enable the Kitty remote deploy call in
+`install_kitty_remote_workflow` and set your targets, for example:
 
 ```bash
-KITTY_REMOTE_HOSTS="thump mba" bash ./install.sh --tools
+KITTY_REMOTE_HOSTS="host1 host2" bash ./install.sh --tools
 ```
 
 ### `wezterm/`
 
-Canonical WezTerm remote-development configuration. `install.sh --tools` and `--all` install a narrowly composed Lua module into `~/.config/wezterm/` and add its loader to a compatible user-owned `~/.wezterm.lua`; the installer refuses to guess when that root config does not have exactly one `return config`. It renders each Herdr tab with a solid host-colored background — **mbp** purple, **dever** blue, and **thump** green — while preserving live working / blocked / done counts from the existing `herdr-kitty-status` terminal-title contract. It also enables the Kitty keyboard protocol so Pi and OMP receive a distinct `Shift+Enter` over SSH, and adds the `herdr-mbp`, `herdr-dever`, and `herdr-thump` shell functions, launch-menu entries, `Cmd+Shift+1/2/3` host shortcuts, and `Cmd+Shift+V` image upload/path insertion for the focused supported remote pane. The WezTerm workflow is local-only; it does not alter Kitty or stream WezTerm files to remote hosts.
+Canonical WezTerm remote-development configuration. `install.sh --tools` and `--all` install a narrowly composed Lua module into `~/.config/wezterm/` and add its loader to a compatible user-owned `~/.wezterm.lua`; the installer refuses to guess when that root config does not have exactly one `return config`. It renders each Herdr tab with a solid host-colored background — colors come from the `HOST_COLORS` table in `remote-workflow.lua`, which is empty in this fork until you add your own hosts (upstream used **mbp** purple, **dever** blue, **thump** green) — while preserving live working / blocked / done counts from the existing `herdr-kitty-status` terminal-title contract. It also enables the Kitty keyboard protocol so Pi and OMP receive a distinct `Shift+Enter` over SSH. The `herdr-<host>` shell functions, launch-menu entries, and `Cmd+Shift+1/2/3` host shortcuts are commented out until you configure your own hosts; `Cmd+Shift+V` image upload/path insertion works for the focused supported remote pane once a host is configured. The WezTerm workflow is local-only; it does not alter Kitty or stream WezTerm files to remote hosts.
 
 Run `bash wezterm/install.sh` for a WezTerm-only local install.
 
 ### `hammerspoon/`
-Terminal-scoped macOS clipboard-image workflow. Its installer copies `scripts/remote-image-paste` to `~/.local/bin/`, adds an isolated managed block to `~/.hammerspoon/init.lua`, and installs Hammerspoon plus `pngpaste` through Homebrew when either is missing. With Terminal, iTerm2, or Ghostty focused, `Cmd+Shift+V` uploads the clipboard image over SSH to both `dever` and `mbp`, then pastes `/tmp/ai-image-paste-anichols/latest.png` into the focused prompt. Kitty and WezTerm are excluded so their host-aware helpers own that chord. The event tap passes the chord through unchanged in non-terminal applications, and rechecks the active app before its asynchronous upload completion can paste text.
+Terminal-scoped macOS clipboard-image workflow. Its installer copies `scripts/remote-image-paste` to `~/.local/bin/`, adds an isolated managed block to `~/.hammerspoon/init.lua`, and installs Hammerspoon plus `pngpaste` through Homebrew when either is missing. With Terminal, iTerm2, or Ghostty focused, `Cmd+Shift+V` uploads the clipboard image over SSH to the hosts in `remote-image-paste`'s `TARGETS` list — empty in this fork until you configure your own machines (upstream used `dever` and `mbp`) — then pastes the shared remote path into the focused prompt. Kitty and WezTerm are excluded so their host-aware helpers own that chord. The event tap passes the chord through unchanged in non-terminal applications, and rechecks the active app before its asynchronous upload completion can paste text.
 
 ### `kitty/`
-Canonical Kitty remote-development configuration, shell reminder, SSH kitten settings, and its local installer. On macOS, `--tools` and `--all` also deploy this tracked bundle and the canonical Herdr config to the `mbp` and `dever` SSH aliases. Remote hosts that are offline produce a warning and are retried the next time the installer runs; set `KITTY_WORKFLOW_STRICT_REMOTE=1` to make an unreachable host fail the install.
+Canonical Kitty remote-development configuration, shell reminder, SSH kitten settings, and its local installer. Remote deployment is disabled in this fork — no remote hosts are configured (upstream deployed this tracked bundle and the canonical Herdr config to the `mbp` and `dever` SSH aliases; re-enable via `KITTY_REMOTE_HOSTS` and the call in `install_kitty_remote_workflow`). Remote hosts that are offline produce a warning and are retried the next time the installer runs; set `KITTY_WORKFLOW_STRICT_REMOTE=1` to make an unreachable host fail the install.
 
 The workflow installs `clipssh` and its Kitty helper into `~/.local/bin`, installs `pngpaste` through Homebrew when needed, installs the commit-pinned `herdr-kitty-status` integration, and sets Herdr toast delivery to `terminal`. On a Kitty client without Herdr, it still installs the status renderer so titles from remote Herdr hosts retain their aliases, colors, and compact counters. It deliberately does not run `herdr integration install pi`, which would overwrite the Pi extension managed by this repository. Set `KITTY_WORKFLOW_SKIP_REMOTE=1` to perform only the current-host install, or override the targets with `KITTY_REMOTE_HOSTS="host1 host2"`.
 

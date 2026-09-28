@@ -30,8 +30,8 @@ Process recent PR comments, verify them, track as a todo list, and implement fix
      - `gh api --paginate "repos/[owner]/[repo]/pulls/[number]/comments?per_page=100"`
    - Reusable merge snippet (writes a normalized, newest-first JSON list to `/tmp/pr-comments-merged.json`):
      ```bash
-     OWNER_REPO="Nodaste-Lab/doct"
-     PR_NUMBER=82
+     OWNER_REPO="<owner>/<repo>"  # e.g. your-org/your-repo
+     PR_NUMBER=<pr-number>
 
      ISSUE_JSON="$(mktemp)"
      REVIEWS_JSON="$(mktemp)"

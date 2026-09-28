@@ -21,13 +21,16 @@ _ai_configs_herdr_wezterm() {
 # the name() function syntax.
 unalias herdr-mbp herdr-dever herdr-thump herdr-mbp14 2>/dev/null
 
-herdr-mbp() { _ai_configs_herdr_wezterm mbp; }
-herdr-dever() { _ai_configs_herdr_wezterm dever; }
-herdr-thump() { _ai_configs_herdr_wezterm thump; }
+# No remote hosts configured in this fork yet. Upstream defined herdr-<host>
+# helpers for the original author's machines; add your own here, e.g.:
+#   herdr-myhost() { _ai_configs_herdr_wezterm myhost; }
+# herdr-mbp() { _ai_configs_herdr_wezterm mbp; }
+# herdr-dever() { _ai_configs_herdr_wezterm dever; }
+# herdr-thump() { _ai_configs_herdr_wezterm thump; }
 
 wezterm-remote-help() {
   print -P '%F{cyan}WezTerm remote workflow%f'
-  print -P '  %F{green}herdr-mbp%f / %F{green}herdr-dever%f / %F{green}herdr-thump%f  open Herdr in a new WezTerm window'
-  print -P '  %F{yellow}Cmd+Shift+1/2/3%f                         open mbp/dever/thump directly'
+  print -P '  %F{green}herdr-<host>%f                            open Herdr in a new WezTerm window (define hosts above)'
+  print -P '  %F{yellow}Cmd+Shift+1/2/3%f                         launch-menu remote entries (configure in remote-workflow.lua)'
   print -P '  %F{yellow}Cmd+Shift+V%f                             upload a clipboard image and paste its remote path'
 }

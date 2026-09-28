@@ -3,9 +3,18 @@
 # absolute, host-independent path on the local clipboard.
 set -euo pipefail
 
-readonly REMOTE_PATH='/tmp/ai-image-paste-anichols/latest.png'
-readonly REMOTE_DIR='/tmp/ai-image-paste-anichols'
-readonly TARGETS=(dever mbp)
+readonly REMOTE_PATH='/tmp/ai-image-paste/latest.png'
+readonly REMOTE_DIR='/tmp/ai-image-paste'
+# No remote hosts configured in this fork yet (upstream used: dever mbp, the
+# original author's machines). Add your own SSH hostnames here when you set up
+# remote machines; the script exits with an error until then.
+readonly TARGETS=()
+# readonly TARGETS=(dever mbp)
+
+if (( ${#TARGETS[@]} == 0 )); then
+  echo 'remote-image-paste: no remote hosts configured (see TARGETS at the top of this script).' >&2
+  exit 2
+fi
 
 notify() {
   if command -v osascript >/dev/null 2>&1; then

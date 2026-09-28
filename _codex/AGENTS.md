@@ -1,10 +1,15 @@
-## Hi, I'm Aaron
+## Hi, I'm Luke
 
-- I'm a product developer in a small organization called Nodaste building products like heddle, ccore2, avalandra, and others
-- My background is in platform and infrastructure engineering, not software development. I care about UX, automation
-  that does the right thing by default, and building safe systems
+- I'm Luke Guildner (`guilu02`), a software engineer who also builds software
+  and hardware side projects — 3D printing, electronics/PCB design, CAD, and drones
+- My background is software and platform engineering. I care about safe
+  automation that does the right thing by default, pragmatic shipping, and
+  well-crafted UX
 - I value clean, maintainable code and modern coding practices. Consult official documentation when needed.
-- Most of my projects live in ~/code/
+- Most of my projects live in ~/Documents/projects/ and ~/projects/
+- I'm beginning to collaborate with Aaron Nichols and the Nodaste organization
+  (heddle, ccore2, avalandra); their tooling (doct.nodaste.com, ltui/Linear) is
+  coming into scope
 
 ## Talking to me
 
@@ -46,7 +51,11 @@ the final report helps keep these responsibilities visible.
 
 ## Delegation
 
-- Follow the active repository and workflow guidance when choosing who performs implementation, including any specified harness. When that guidance leaves the choice open, handle small tasks directly and consider delegating substantial, clearly scoped implementation to Sol (`gpt-6-sol`, medium reasoning, `fork_turns="none"`).
+- Follow the active repository and workflow guidance when choosing who performs implementation, including any specified harness. When that guidance leaves the choice open, handle small tasks directly and consider delegating substantial, clearly scoped implementation to a delegate model.
+  <!-- The original config delegates to "Sol" (gpt-6-sol, medium reasoning,
+       fork_turns="none"), which requires the repo author's local model-proxy
+       setup (see _pi/models.json). If you configure an equivalent model
+       alias, name it here. -->
 - Provide delegates enough context to implement and verify independently
 - Avoid micro-managing delegates - allow them to discover and catch their own mistakes.
 - If you are responsible for verifying the work of a delegate, give them clear feedback on what to improve

@@ -81,7 +81,11 @@ options_with_value = {
     "--login-shell", "--option", "--port", "--remote-command", "--user",
 }
 
-KNOWN_HOSTS = ("dever", "mbp14-2", "thump", "mbp", "mba")
+# No remote hosts configured in this fork yet (upstream listed the original
+# author machines: "dever", "mbp14-2", "thump", "mbp", "mba"). Add your own
+# SSH host aliases here; they are matched against pane/tab titles to pick the
+# upload target. Command-line ssh/mosh detection below still works regardless.
+KNOWN_HOSTS = ()
 
 def base(token):
     return PurePosixPath(token).name
@@ -156,8 +160,8 @@ def host_from_title(title):
     for known in KNOWN_HOSTS:
         if re.search(rf"(?<![a-z0-9]){re.escape(known)}(?![a-z0-9])", t):
             return known
-    if "aarons-macbook-pro" in t or "aarons-mbp" in t:
-        return "mbp"
+    # Upstream also mapped the original author machine titles
+    # ("aarons-macbook-pro"/"aarons-mbp") to "mbp"; removed in this fork.
     return None
 
 def host_from_window(window):
@@ -186,7 +190,7 @@ for title in os_window_titles:
 
 sys.exit(1)
 PY
-)" || fail "could not determine SSH host from parent pane (focus a dever/mbp kitten ssh tab)"
+)" || fail "could not determine SSH host from parent pane (focus a kitten ssh tab)"
 fi
 
 # clipssh aliases are bare names (dever, mbp, ...). Strip a user@ prefix when

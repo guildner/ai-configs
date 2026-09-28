@@ -1,11 +1,11 @@
 ---
 name: brave-cdp
-description: Interact with Aaron's existing Brave browser session through a shared CDP CLI installed under `~/.agents/skills`. Use when asked to inspect, debug, or interact with a page that is already open in Brave. Falls back to Chrome, Chromium, Edge, or Vivaldi if Brave is unavailable. This is a local shared skill with `scripts/cdp.mjs`, not an MCP server.
+description: Interact with the user's existing Brave browser session through a shared CDP CLI installed under `~/.agents/skills`. Use when asked to inspect, debug, or interact with a page that is already open in Brave. Falls back to Chrome, Chromium, Edge, or Vivaldi if Brave is unavailable. This is a local shared skill with `scripts/cdp.mjs`, not an MCP server.
 ---
 
 # Brave CDP
 
-Use this shared skill to drive Aaron's existing Brave session over the Chrome DevTools Protocol.
+Use this shared skill to drive the user's existing Brave session over the Chrome DevTools Protocol.
 
 Primary entrypoint:
 

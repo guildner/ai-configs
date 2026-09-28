@@ -11,7 +11,19 @@ import subprocess
 import sys
 from pathlib import Path
 
-HOSTS = {"this-host": None, "dever": "dever", "macbook-pro": "mbp"}
+# Hosts probed for herdr workspaces/agents/git activity. No remote hosts are
+# configured in this fork yet (upstream probed the author's machines
+# "dever"/"mbp" over SSH); add your own entries when you have remote machines.
+HOSTS = {"this-host": None}
+# HOSTS = {"this-host": None, "remote1": "remote1", "remote2": "remote2"}
+
+# Git author filter used to find your commits across repos on each host.
+# Update to match your own git author name/email (upstream used Aaron's).
+GIT_AUTHOR_RE = r"guildner\|Luke Guildner"
+
+# GitHub logins counted as "your" merged PRs in the rendered draft.
+# Update to your GitHub username(s) (upstream used Aaron's).
+MY_GITHUB_LOGINS = {"guildner"}
 DOCT_WORKSPACES = {
     "shared": "6dbf05f0-fc4b-41f4-b927-5799ec7be0bb",
     "personal": "759bfae3-44f1-4ce5-9bff-9077d9933a21",
@@ -42,7 +54,7 @@ def parsed(result: dict) -> object | None:
 def collect(day: dt.date) -> dict:
     next_day = day + dt.timedelta(days=1)
     packet: dict = {"date": str(day), "generated_at": dt.datetime.now().astimezone().isoformat(), "hosts": {}, "warnings": []}
-    git_cmd = ["sh", "-lc", f'''for r in "$HOME"/code/* "$HOME"/.herdr/worktrees/*/*; do git -C "$r" rev-parse --is-inside-work-tree >/dev/null 2>&1 || continue; git -C "$r" log --all --since="{day} 00:00" --until="{next_day} 00:00" --author='Aaron\\|anichols\\|adnichols' --format='%H%x09%ad%x09%s' --date=iso-local 2>/dev/null | while IFS= read -r line; do printf '%s\\t%s\\n' "$line" "$r"; done; done | sort -u''']
+    git_cmd = ["sh", "-lc", f'''for r in "$HOME"/projects/* "$HOME"/Documents/projects/* "$HOME"/.herdr/worktrees/*/*; do git -C "$r" rev-parse --is-inside-work-tree >/dev/null 2>&1 || continue; git -C "$r" log --all --since="{day} 00:00" --until="{next_day} 00:00" --author='{GIT_AUTHOR_RE}' --format='%H%x09%ad%x09%s' --date=iso-local 2>/dev/null | while IFS= read -r line; do printf '%s\\t%s\\n' "$line" "$r"; done; done | sort -u''']
     for label, host in HOSTS.items():
         workspaces = run(["herdr", "workspace", "list"], host)
         agents = run(["herdr", "agent", "list"], host)
@@ -107,7 +119,7 @@ def plan_outcome(title: str) -> str | None:
 
 
 def render(packet: dict) -> str:
-    prs = [p for p in packet["merged_prs"] if (p.get("author") or {}).get("login") in {"adnichols", "aaronnodaste"}]
+    prs = [p for p in packet["merged_prs"] if (p.get("author") or {}).get("login") in MY_GITHUB_LOGINS]
     active, blocked = [], []
     cutoff = dt.datetime.fromisoformat(packet["generated_at"]) - dt.timedelta(days=2)
     for host, data in packet["hosts"].items():
@@ -116,7 +128,7 @@ def render(packet: dict) -> str:
             state = a.get("agent_status")
             project = Path(a.get('cwd', '')).name or a.get('cwd', '')
             item = f"{host}: {project} ({state})"
-            if state == "working" and project not in {"anichols", "~"}: active.append(item)
+            if state == "working" and project not in {Path.home().name, "~"}: active.append(item)
             if state == "blocked": blocked.append(item)
     plans = []
     for board in packet["doct"].values():

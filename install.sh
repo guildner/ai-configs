@@ -112,10 +112,10 @@ print_usage() {
     echo "  - Use Herdr to launch and manage visible interactive agent sessions"
     echo "  - The tracked Herdr and Amp configs are installed locally whenever --tools or --all runs"
     echo "  - The tracked OMP config, guidance, agents, and non-credential extensions are installed locally whenever --tools or --all runs"
-    echo "  - The tracked Paseo skills are installed locally and streamed to mbp/dever/thump whenever --tools or --all runs; live daemon profiles and providers are not overwritten"
-    echo "  - Kitty/Herdr remote workflow files are streamed to mbp/dever whenever --tools or --all runs on macOS"
+    echo "  - The tracked Paseo skills are installed locally whenever --tools or --all runs (remote deployment is disabled; no remote hosts are configured in this fork)"
+    echo "  - Kitty/Herdr remote workflow files are installed locally whenever --tools or --all runs (remote deployment is disabled; no remote hosts are configured in this fork)"
     echo "  - The tracked WezTerm remote workflow is installed locally whenever --tools or --all runs"
-    echo "  - Managed Amp settings/modes are streamed to mbp/dever/thump whenever --tools or --all runs on macOS"
+    echo "  - Managed Amp settings/modes are installed locally whenever --tools or --all runs (remote deployment is disabled; no remote hosts are configured in this fork)"
     echo "  - Managed Herdr plugins are refreshed from their upstream repositories whenever --tools or --all runs"
     echo "  - The installer removes positively identified managed deprecated skill entries; ambiguous Gemini, OpenCode, and Pi plan-mode files are preserved for explicit host cleanup"
     echo "  - Use --update to run 'npx skills update -g -y' for skills installed through skills.sh before the normal sync"
@@ -592,7 +592,10 @@ install_tools() {
     echo ""
     install_herdr_plugins
     echo ""
-    install_ltui
+    # ltui is cloned from the org-private Nodaste-Lab repo. Best-effort: a
+    # machine without repo access (or missing pnpm/node) warns and continues
+    # instead of failing the whole --tools run.
+    install_ltui || echo -e "${YELLOW}⚠ ltui install failed; skipping (requires access to ${LTUI_REPO_URL:-https://github.com/Nodaste-Lab/ltui.git})${NC}"
 }
 
 install_omp_config() {
@@ -605,10 +608,12 @@ install_paseo_config() {
     echo "Installing managed Paseo skills..."
     bash "$REPO_ROOT/_paseo/install.sh"
 
-    # Stream the tracked bundle to the other Paseo hosts without relying on
-    # their ai-configs checkouts being clean or current. The local host is
-    # skipped inside the helper; offline hosts warn rather than block.
-    bash "$REPO_ROOT/scripts/install-paseo-remote-hosts.sh"
+    # Remote deployment disabled: this fork has no remote hosts that ai-configs
+    # should touch. The upstream repo streamed the tracked bundle to its
+    # author's machines (mbp/dever/thump) over SSH; the helper remains in
+    # scripts/ and is a no-op unless PASEO_REMOTE_HOSTS is set. Re-enable the
+    # call below once you have remote hosts of your own.
+    # bash "$REPO_ROOT/scripts/install-paseo-remote-hosts.sh"
 
     echo -e "${GREEN}✓ Managed Paseo configuration processed${NC}"
 }
@@ -632,11 +637,13 @@ install_amp_config() {
     echo "Installing managed Amp configuration..."
     bash "$REPO_ROOT/amp/install.sh"
 
-    # Stream tracked Amp settings/modes to other hosts from a macOS client,
-    # without relying on remote ai-configs checkouts being clean or current.
-    if [ "$(uname -s)" = "Darwin" ]; then
-        bash "$REPO_ROOT/scripts/install-amp-remote-hosts.sh"
-    fi
+    # Remote deployment disabled: this fork has no remote hosts that ai-configs
+    # should touch. Upstream streamed Amp settings/modes to mbp/dever/thump
+    # from a macOS client. Re-enable (and set AMP_REMOTE_HOSTS to your hosts)
+    # when you add remote machines.
+    # if [ "$(uname -s)" = "Darwin" ]; then
+    #     bash "$REPO_ROOT/scripts/install-amp-remote-hosts.sh"
+    # fi
 
     echo -e "${GREEN}✓ Managed Amp configuration processed${NC}"
 }
@@ -645,13 +652,13 @@ install_kitty_remote_workflow() {
     echo "Installing managed Kitty remote workflow..."
     bash "$REPO_ROOT/kitty/install.sh"
 
-    # A macOS Kitty client is the distribution point for both remote hosts.
-    # Stream the tracked files instead of relying on either remote repo being
-    # clean or already updated. Offline hosts warn by default rather than
-    # blocking unrelated tool updates.
-    if [ "$(uname -s)" = "Darwin" ]; then
-        bash "$REPO_ROOT/scripts/install-kitty-remote-hosts.sh"
-    fi
+    # Remote deployment disabled: this fork has no remote hosts that ai-configs
+    # should touch. Upstream streamed the Kitty/Herdr remote workflow to
+    # mbp/dever from a macOS client. Re-enable (and set KITTY_REMOTE_HOSTS to
+    # your hosts) when you add remote machines.
+    # if [ "$(uname -s)" = "Darwin" ]; then
+    #     bash "$REPO_ROOT/scripts/install-kitty-remote-hosts.sh"
+    # fi
 
     echo -e "${GREEN}✓ Managed Kitty remote workflow processed${NC}"
 }
@@ -713,8 +720,8 @@ install_ltui() {
 
     if [ -d "$checkout_dir/.git" ]; then
         echo "  - Updating $checkout_dir..."
-        git -C "$checkout_dir" remote set-url origin "$ltui_repo_url"
-        git -C "$checkout_dir" fetch --prune origin
+        git -C "$checkout_dir" remote set-url origin "$ltui_repo_url" || return 1
+        git -C "$checkout_dir" fetch --prune origin || return 1
     else
         if [ -e "$checkout_dir" ]; then
             echo "  - Replacing non-git ltui cache at $checkout_dir..."
@@ -722,23 +729,23 @@ install_ltui() {
         fi
 
         echo "  - Cloning $ltui_repo_url into $checkout_dir..."
-        git clone "$ltui_repo_url" "$checkout_dir"
-        git -C "$checkout_dir" fetch --prune origin
+        git clone "$ltui_repo_url" "$checkout_dir" || return 1
+        git -C "$checkout_dir" fetch --prune origin || return 1
     fi
 
     if git -C "$checkout_dir" rev-parse --verify --quiet "origin/$ltui_ref" >/dev/null; then
-        git -C "$checkout_dir" checkout --force -B ai-configs-install "origin/$ltui_ref"
+        git -C "$checkout_dir" checkout --force -B ai-configs-install "origin/$ltui_ref" || return 1
     else
-        git -C "$checkout_dir" checkout --force "$ltui_ref"
+        git -C "$checkout_dir" checkout --force "$ltui_ref" || return 1
     fi
 
     echo "  - Installing dependencies..."
     # The standalone ltui repo has not adopted a pnpm lockfile yet, so install
     # without --frozen-lockfile and let pnpm generate pnpm-lock.yaml in the cache.
-    (cd "$checkout_dir" && pnpm install)
+    (cd "$checkout_dir" && pnpm install) || return 1
 
     echo "  - Building ltui..."
-    (cd "$checkout_dir" && pnpm run build)
+    (cd "$checkout_dir" && pnpm run build) || return 1
 
     echo "  - Installing ltui into $install_bin_dir..."
     ln -sfn "$checkout_dir/bin/ltui" "$install_bin_dir/ltui"

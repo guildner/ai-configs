@@ -121,10 +121,14 @@ install_root_loader
 upsert_managed_block "$HOME/.zshrc" "wezterm remote workflow" \
   'source "$HOME/.config/ai-configs/wezterm-remote-workflow.zsh"'
 
-ensure_clipssh_alias mbp anichols@mbp
-ensure_clipssh_alias dever anichols@dever
-ensure_clipssh_alias thump anichols@thump
-ensure_clipssh_alias mbp14-2 anichols@mbp14-2
+# No remote hosts configured in this fork yet. Upstream seeded clipssh aliases
+# for the original author's machines; add your own user@host aliases here when
+# you set up remote machines, e.g.:
+#   ensure_clipssh_alias myhost myuser@myhost
+# ensure_clipssh_alias mbp anichols@mbp
+# ensure_clipssh_alias dever anichols@dever
+# ensure_clipssh_alias thump anichols@thump
+# ensure_clipssh_alias mbp14-2 anichols@mbp14-2
 if [[ -f "$HOME/.clipssh/aliases" ]]; then
   python3 - "$HOME/.clipssh/aliases" <<'PY'
 from pathlib import Path

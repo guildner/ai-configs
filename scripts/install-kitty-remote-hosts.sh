@@ -2,7 +2,10 @@
 set -euo pipefail
 
 REPO_ROOT="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
-REMOTE_HOSTS="${KITTY_REMOTE_HOSTS:-mbp dever}"
+# No remote hosts configured in this fork yet (upstream used "mbp dever", the
+# original author's machines). Set KITTY_REMOTE_HOSTS or pass --hosts when you
+# have remote machines; empty means local-only.
+REMOTE_HOSTS="${KITTY_REMOTE_HOSTS:-}"
 STRICT="${KITTY_WORKFLOW_STRICT_REMOTE:-0}"
 SUMMARY_JSON=""
 STARTED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"

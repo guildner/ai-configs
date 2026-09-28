@@ -4,11 +4,12 @@
 -- retaining terminal-agnostic title updates from the remote Herdr plugin.
 local M = {}
 
+-- Tab color palette per remote host. No remote hosts are configured in this
+-- fork yet; add your own hostnames (they're matched against SSH domains,
+-- pane titles, and ssh argv) when you set up remote machines.
+-- Upstream entries for reference: mbp, dever, thump, mbp14-2.
 local HOST_COLORS = {
-  mbp = { background = '#3B2E5A', active_background = '#594382', foreground = '#F0EAF7' },
-  dever = { background = '#1E3A5F', active_background = '#2A5185', foreground = '#E6EDF3' },
-  thump = { background = '#244436', active_background = '#32604D', foreground = '#E6F2EA' },
-  ['mbp14-2'] = { background = '#244436', active_background = '#32604D', foreground = '#E6F2EA' },
+  -- myhost = { background = '#1E3A5F', active_background = '#2A5185', foreground = '#E6EDF3' },
 }
 
 local STATUS_COLORS = {
@@ -172,22 +173,14 @@ function M.apply(config, wezterm)
   config.show_new_tab_button_in_tab_bar = true
   config.hide_tab_bar_if_only_one_tab = false
 
-  append_launch_menu(config, { label = 'Herdr · mbp', args = herdr_command('mbp') })
-  append_launch_menu(config, { label = 'Herdr · dever', args = herdr_command('dever') })
-  append_launch_menu(config, { label = 'Herdr · thump', args = herdr_command('thump') })
-
-  append_key(config, {
-    key = '1', mods = 'CMD|SHIFT',
-    action = wezterm.action.SpawnCommandInNewWindow { args = herdr_command('mbp') },
-  })
-  append_key(config, {
-    key = '2', mods = 'CMD|SHIFT',
-    action = wezterm.action.SpawnCommandInNewWindow { args = herdr_command('dever') },
-  })
-  append_key(config, {
-    key = '3', mods = 'CMD|SHIFT',
-    action = wezterm.action.SpawnCommandInNewWindow { args = herdr_command('thump') },
-  })
+  -- Remote host launch-menu entries and keymaps. No remote hosts configured in
+  -- this fork yet; upstream mapped the author's machines (mbp/dever/thump).
+  -- Add your own hosts here when you set up remote machines, e.g.:
+  --   append_launch_menu(config, { label = 'Herdr · myhost', args = herdr_command('myhost') })
+  --   append_key(config, {
+  --     key = '1', mods = 'CMD|SHIFT',
+  --     action = wezterm.action.SpawnCommandInNewWindow { args = herdr_command('myhost') },
+  --   })
   append_key(config, {
     key = '[', mods = 'OPT', action = wezterm.action.SendString '\x1b[27;3;91~',
   })
@@ -201,7 +194,7 @@ function M.apply(config, wezterm)
       if not host then
         window:toast_notification(
           'WezTerm image paste',
-          'Focus a Herdr or SSH pane for mbp, dever, or thump before pasting an image.',
+          'Focus a Herdr or SSH pane for a configured remote host before pasting an image.',
           nil,
           5000
         )

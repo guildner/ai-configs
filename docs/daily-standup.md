@@ -4,7 +4,7 @@
 
 ## Sources
 
-- Herdr workspaces, agents, and prior-day Git activity on this host, `dever`, and `mbp`
+- Herdr workspaces, agents, and prior-day Git activity on this host (remote hosts can be added to `HOSTS` in `scripts/daily_standup.py` — none configured in this fork)
 - Doct plan boards in Shared and Personal
 - Recent messages in Nodaste `#stand-up`, used as format context
 - Nodaste-Lab Heddle PRs merged on the requested date

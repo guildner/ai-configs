@@ -90,7 +90,7 @@
         "devin"
       ],
       "canonicalSource": "skills/brave-cdp",
-      "notes": "Brave-first shared CDP skill for attaching to Aaron's existing browser session, with Chromium-family fallback support and a dedicated automation-profile launcher script. Optional profile: ops-browser; not installed into default Pi/Codex shared-skill context unless explicitly requested.",
+      "notes": "Brave-first shared CDP skill for attaching to the user's existing browser session, with Chromium-family fallback support and a dedicated automation-profile launcher script. Optional profile: ops-browser; not installed into default Pi/Codex shared-skill context unless explicitly requested.",
       "sourceType": "repo",
       "defaultInstall": false,
       "profile": "ops-browser"

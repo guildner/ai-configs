@@ -176,8 +176,12 @@ install_macos_kitty_workflow() {
   upsert_managed_block "$HOME/.zshrc" "kitty remote workflow" \
     'source "$HOME/.config/ai-configs/kitty-remote-workflow.zsh"'
 
-  ensure_clipssh_alias mbp anichols@mbp
-  ensure_clipssh_alias dever anichols@dever
+  # No remote hosts configured in this fork yet. Upstream seeded clipssh
+  # aliases for the original author's machines (anichols@mbp, anichols@dever).
+  # Add your own user@host aliases here when you set up remote machines, e.g.:
+  #   ensure_clipssh_alias myhost myuser@myhost
+  # ensure_clipssh_alias mbp anichols@mbp
+  # ensure_clipssh_alias dever anichols@dever
   echo "Kitty remote workflow installed locally."
 }
 
